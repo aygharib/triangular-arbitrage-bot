@@ -1,0 +1,7 @@
+# clang-tidy -checks=bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-readability-braces-around-statements,-readability-simplify-boolean-expr,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers,-bugprone-easily-swappable-parameters -dump-config > .clang-tidy
+---
+Checks:          'clang-diagnostic-*,clang-analyzer-*,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-braces-around-statements,-readability-simplify-boolean-expr,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers,-bugprone-easily-swappable-parameters'
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+FormatStyle:     none
