@@ -1,4 +1,5 @@
 [requires]
+fmt/9.1.0
 libcurl/7.87.0
 
 [generators]
