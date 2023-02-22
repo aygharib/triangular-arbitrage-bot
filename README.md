@@ -94,9 +94,9 @@ Overall time complexity: `O(V) + O(((V-1)^2 - (V-1))/ 2) + O(V^3)`
 4. Build a `std::vector<Cycle> cycles`, containing all possible trading cycles of length 3. Example of cycles: `Cycle{"BTC", "ETH", "BNB"}, Cycle{"BNB", "ETH", "BTC"}, Cycle{"ABC", "DEF", "GHI"}, Cycle{"GHI", "DEF", "ABC"}`. These there exist two cycles for every trianglular cycle, one in each trading direction. This duplication allows for much simpler calculation when calculating profitability.
 
 **The following steps repeat every iteration to calculate profitable cycles:**
-5. Build a `std::map<std::string, double> cache`, that stores the price of a trading pair if that trading pair. Subsequent calls to the same trading pair in the same iteration will use the cached value rather than sending another request. This cache is used when calculating cycle profitability. Uses `/api/v3/depth` for each trading pair. `cache` gets cleared at the end of every loop to get rid of outdated prices.
-6. Build a `std::vector<Trade> trades`, building trades by looping through every `Cycle` in `cycles`. For every sequential pair, do a lookup in `tickersToSymbols` to get the symbol, and then check `cache` if that symbol exists in the cache. If it does then use the price stored in the cache to calculate the profitability. If it doesn't exist in the cache then do step 5.
-7. Every `Trade` in `trades` in step 6 with a profit >= 1 gets stored in `std::vector<Trade> profitableTrades`.
+1. Build a `std::map<std::string, double> cache`, that stores the price of a trading pair if that trading pair. Subsequent calls to the same trading pair in the same iteration will use the cached value rather than sending another request. This cache is used when calculating cycle profitability. Uses `/api/v3/depth` for each trading pair. `cache` gets cleared at the end of every loop to get rid of outdated prices.
+2. Build a `std::vector<Trade> trades`, building trades by looping through every `Cycle` in `cycles`. For every sequential pair, do a lookup in `tickersToSymbols` to get the symbol, and then check `cache` if that symbol exists in the cache. If it does then use the price stored in the cache to calculate the profitability. If it doesn't exist in the cache then do previous step.
+3. Every `Trade` in `trades` with a profit >= 1 gets stored in `std::vector<Trade> profitableTrades`.
 
 ## Bottlenecks
 There are a few bottlenecks to consider to reduce latency and increase performance of this bot.
