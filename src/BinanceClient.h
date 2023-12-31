@@ -32,20 +32,17 @@ public:
     std::vector<Trade> trades;
     std::vector<Trade> profitableTrades;
 
-    
-    std::map<std::set<std::string>, TradingPair> tradingPairs; // from {ETH, BTC} to TradingPair{ETHBTC, ETH, BTC}
-    std::map<std::string, TradingPairPrice> tradingPairPrices; // from TradingPair{ETHBTC, ETH, BTC}.name to TradingPairPrice{123, 324}
-                                                               // this is the new cache
+    std::map<std::set<std::string>, TradingPair> tradingPairs;
+    std::map<std::string, TradingPairPrice> tradingPairPrices;
 
-    // I need a map from symbol to set of tickers, so I can use it when pulling price based on symbol
     std::map<std::string, std::set<std::string>> symbolToTickers;
-    // std::map<std::set<std::string>, std::string> tickersToSymbols;
 
     BinanceClient();
     ~BinanceClient();
 
-    // Delete Copy Constructor, Move Constructor, Copy Assignment Operator, Move Assignment Operator
-    // Rule of 5: forced to define these after implementing custom destructor
+    // Delete Copy Constructor, Move Constructor, Copy Assignment Operator, Move
+    // Assignment Operator Rule of 5: forced to define these after implementing
+    // custom destructor
     BinanceClient(const BinanceClient&) = delete;
     BinanceClient(BinanceClient&&) = delete;
     auto operator=(const BinanceClient&) -> BinanceClient& = delete;
@@ -54,5 +51,5 @@ public:
     auto buildTickersSymbolsTickersToSymbolsConnections() -> void;
     auto buildCycles() -> void;
     auto buildTrades() -> void;
-    auto addPriceToTradingPairPrices(std::string name) -> void;
+    auto addPriceToTradingPairPrices(const std::string& name) -> void;
 };

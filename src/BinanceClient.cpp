@@ -1,7 +1,7 @@
 #include "BinanceClient.h"
 
-#include <fmt/core.h>
 #include <curl/curl.h>
+#include <fmt/core.h>
 #include <nlohmann/json.hpp>
 #include <string>
 
@@ -21,13 +21,13 @@ BinanceClient::~BinanceClient() {
     curl_global_cleanup();
 }
 
-auto curlCallbackFunction(void* contents, size_t size, size_t nmemb, std::string* s) -> size_t {
+auto curlCallbackFunction(void* contents, size_t size, size_t nmemb,
+                          std::string* s) -> size_t {
     auto newLength = size * nmemb;
     try {
-        s->append((char*)contents, newLength);
-    }
-    catch(std::bad_alloc &e) {
-        //handle memory problem
+        s->append((char*) contents, newLength);
+    } catch (std::bad_alloc& e) {
+        // handle memory problem
         return 0;
     }
 
@@ -41,22 +41,25 @@ auto BinanceClient::buildTickersSymbolsTickersToSymbolsConnections() -> void {
     std::string s;
     if (curl != nullptr) {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-        curl_easy_setopt(curl, CURLOPT_URL, "https://api.binance.com/api/v3/exchangeInfo");
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); //only for https
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L); //only for https
+        curl_easy_setopt(curl, CURLOPT_URL,
+                         "https://api.binance.com/api/v3/exchangeInfo");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // only for https
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L); // only for https
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlCallbackFunction);
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); //remove this to disable verbose output
+        curl_easy_setopt(curl, CURLOPT_VERBOSE,
+                         1L); // remove this to disable verbose output
 
         // Perform the request, res will get the return code
         auto res = curl_easy_perform(curl);
 
         // Check for errors
-        if(res != CURLE_OK) {
-            fmt::print(stderr, "curl_easy_perform() failed: {}\n", curl_easy_strerror(res));
+        if (res != CURLE_OK) {
+            fmt::print(stderr, "curl_easy_perform() failed: {}\n",
+                       curl_easy_strerror(res));
 
             // Clean up libcurl easy session
             curl_easy_cleanup(curl);
@@ -110,7 +113,7 @@ auto BinanceClient::buildCycles() -> void {
             blacklist[child].push_back(root);
 
             auto leaves = connections[child];
-            
+
             for (const auto& leaf : leaves) {
                 const auto& v2 = blacklist[child];
                 auto a2 = v2.begin();
@@ -121,7 +124,7 @@ auto BinanceClient::buildCycles() -> void {
                 }
 
                 // if children contains leaf then its a cycle
-                if (std::count(children.begin(), children.end(), leaf)) {
+                if (std::count(children.begin(), children.end(), leaf) != 0) {
                     // Cycle cycle{root, child, leaf};
                     std::vector<std::string> cycle{root, child, leaf};
                     cycles.push_back(cycle);
@@ -131,7 +134,7 @@ auto BinanceClient::buildCycles() -> void {
     }
 }
 
-auto BinanceClient::addPriceToTradingPairPrices(std::string name) -> void {
+auto BinanceClient::addPriceToTradingPairPrices(const std::string& name) -> void {
     // Start a libcurl easy session
     auto* curl = curl_easy_init();
 
@@ -143,21 +146,23 @@ auto BinanceClient::addPriceToTradingPairPrices(std::string name) -> void {
 
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
         curl_easy_setopt(curl, CURLOPT_URL, temp.c_str());
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); //only for https
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L); //only for https
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // only for https
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L); // only for https
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlCallbackFunction);
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); //remove this to disable verbose output
+        curl_easy_setopt(curl, CURLOPT_VERBOSE,
+                         1L); // remove this to disable verbose output
 
         // Perform the request, res will get the return code
         auto res = curl_easy_perform(curl);
 
         // Check for errors
-        if(res != CURLE_OK) {
-            fmt::print(stderr, "curl_easy_perform() failed: {}\n", curl_easy_strerror(res));
+        if (res != CURLE_OK) {
+            fmt::print(stderr, "curl_easy_perform() failed: {}\n",
+                       curl_easy_strerror(res));
 
             // Clean up libcurl easy session
             curl_easy_cleanup(curl);
@@ -167,7 +172,7 @@ auto BinanceClient::addPriceToTradingPairPrices(std::string name) -> void {
     auto j = json::parse(s);
     auto bids = j["bids"];
     auto asks = j["asks"];
-    
+
     auto topBidPrice = std::stod(bids[0][0].get<nlohmann::json::string_t>());
     auto topBidQuantity = std::stod(bids[0][1].get<nlohmann::json::string_t>());
     auto topAskPrice = std::stod(asks[0][0].get<nlohmann::json::string_t>());
@@ -184,12 +189,13 @@ auto BinanceClient::buildTrades() -> void {
         double profit{0.};
 
         for (int i = 0; i < 3; i++) {
-            auto ticker1 = cycle.at(i); // ETH
+            auto ticker1 = cycle.at(i);           // ETH
             auto ticker2 = cycle.at((i + 1) % 3); // BTC
 
             auto tradingPair = tradingPairs[{ticker1, ticker2}];
 
-            // If tradingPairPrices doesn't contain this price, go calculate it and store it
+            // If tradingPairPrices doesn't contain this price, go calculate it
+            // and store it
             if (!tradingPairPrices.contains(tradingPair.name)) {
                 // add to tradingPairPrices from a request
                 addPriceToTradingPairPrices(tradingPair.name);
@@ -199,8 +205,7 @@ auto BinanceClient::buildTrades() -> void {
 
             if (ticker1 == tradingPair.baseAsset) {
                 profit += tradingPairPrice.askPrice;
-            }
-            else if (ticker1 == tradingPair.quoteAsset) {
+            } else if (ticker1 == tradingPair.quoteAsset) {
                 profit += tradingPairPrice.bidPrice;
             }
         }
